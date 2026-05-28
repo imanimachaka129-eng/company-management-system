@@ -1,0 +1,76 @@
+<!-- templates/employee_form.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    {% if employee %}
+                        <i class="fas fa-edit me-2"></i>Edit Employee
+                    {% else %}
+                        <i class="fas fa-user-plus me-2"></i>Add New Employee
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ employee.name if employee else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address *</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="{{ employee.email if employee else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="position" class="form-label">Position</label>
+                        <input type="text" class="form-control" id="position" name="position" 
+                               value="{{ employee.position if employee else '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="Salary" class="form-label">Salary (TZS)</label>
+                        <input type="number" step="0.01" class="form-control" id="salary" name="salary" 
+                               value="{{ employee.salary if employee else '' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hire_date" class="form-label">Hire Date</label>
+                        <input type="date" class="form-control" id="hire_date" name="hire_date" 
+                               value="{{ employee.hire_date if employee else '' }}">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="department_id" class="form-label">Department</label>
+                        <select class="form-select" id="department_id" name="department_id">
+                            <option value="">-- Select Department --</option>
+                            {% for dept in departments %}
+                                <option value="{{ dept.id }}" 
+                                    {% if employee and employee.department_id == dept.id %}selected{% endif %}>
+                                    {{ dept.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>
+                            {% if employee %}Update{% else %}Create{% endif %} Employee
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

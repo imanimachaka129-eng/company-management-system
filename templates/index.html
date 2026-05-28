@@ -1,0 +1,120 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <h3 class="mb-0">
+                <i class="fas fa-users text-primary me-2"></i>Employee Directory
+            </h3>
+            <a href="{{ url_for('add_employee') }}" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i>Add Employee
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Department Filter -->
+        <form method="GET" action="{{ url_for('index') }}" class="mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label for="department_id" class="form-label fw-bold">
+                        <i class="fas fa-filter me-1"></i>Filter by Department
+                    </label>
+                    <select name="department_id" id="department_id" class="form-select">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.id }}" {% if selected_dept == dept.id %}selected{% endif %}>
+                                {{ dept.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>Filter
+                    </button>
+                </div>
+                {% if selected_dept %}
+                <div class="col-md-2">
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary w-100">
+                        <i class="fas fa-times me-1"></i>Clear
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+
+        <!-- Employees Table -->
+        {% if employees %}
+            <div class="table-responsive">
+                <table class="table table-hover table-striped align-middle">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Position</th>
+                            <th>Department</th>
+                            <th>Salary</th>
+                            <th>Hire Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for emp in employees %}
+                        <tr>
+                            <td class="fw-bold">{{ emp.name }}</td>
+                            <td>{{ emp.email }}</td>
+                            <td>{{ emp.position or '-' }}</td>
+                            <td>
+                                {% if emp.department_name %}
+                                    <span class="badge bg-info">{{ emp.department_name }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">No Dept</span>
+                                {% endif %}
+                            </td>
+                            <td>${{ "%.2f"|format(emp.salary) if emp.salary else '-' }}</td>
+                            <td>{{ emp.hire_date or '-' }}</td>
+                            <td>
+                                <a href="{{ url_for('edit_employee', id=emp.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ emp.id }}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                                
+                                <!-- Delete Confirmation Modal -->
+                                <div class="modal fade" id="deleteModal{{ emp.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirm Delete</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete <strong>{{ emp.name }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form action="{{ url_for('delete_employee', id=emp.id) }}" method="POST" style="display: inline;">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle me-2"></i>No employees found.
+                <a href="{{ url_for('add_employee') }}" class="alert-link">Add your first employee</a>.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
